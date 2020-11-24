@@ -6,13 +6,8 @@ import pandas as pd
 import importlib
 import constants
 
-importlib.reload(constants)
-
-# TODO: only grab data if you haven't update in a day
 
 # If the file has been updated today, then update it
-
-
 def check_updated(log_file_name: str = constants.LOG) -> bool:
     """
     Checks the logfile to see if the data
@@ -44,34 +39,53 @@ def check_updated(log_file_name: str = constants.LOG) -> bool:
     return updated_today
 
 
-        url = constants.NYT_DATA_ALL
-        r = requests.get(url)
+def replace_live_file(data_url: str = constants.NYT_DATA_ALL,
+                      live_file: str = constants.NYT_DATA_FILE,
+                      backup_file: str = constants.NYT_BACKUP_FILE,
+                      log_file: str = constants.LOG) -> None:
+    """
+    Replace the current live file with the current version on the NYT
+    github site for covid data.
 
-        # back_up prior day's file
-        file_cmd = f"mv {constants.NYT_DATA_FILE} {constants.NYT_BACKUP_FILE}"
+    Inputs:
+        data_url (str): url to the nyt github with the covid data
+
+        live_file (str): relative path and name of the file used by the
+                         dashboard
+
+        backup_file (str): relative path and name of the prevoius file used by
+                           the dashboard.
+
+        log_file (str): relative path and name of the file containing ordered
+                        datestamps of each update
+
+        Output:
+            None, overwrites the backup file with the current live file and
+            updaes the current file with the live version on the nyt github.
+    """
+
+    # back_up prior day's file
+    file_cmd = f"mv {live_file} {backup_file}"
+
+    try:
         subprocess.run(shlex.split(file_cmd))
+    except:
+        print("Live file does not exist...no backup created")
 
-        # Replace the "live" file with new
-        with open(constants.NYT_DATA_FILE, 'wb') as f:
-            f.write(r.content)
+    # Replace the "live" file with new
+    r = requests.get(data_url)
+    with open(live_file, 'wb') as f:
+        f.write(r.content)
 
-    else:
-        print("Data is already current, no updates made")
+    # Log the latest update
+    with open(constants.LOG, 'a') as logfile:
+        logfile.write(str(datetime.date.today()) + '\n')
 
+    now = datetime.datetime.now().strftime('%D %H:%M')
 
+    print(f"\nData updated as of {now}\n")
 
-
-
-df = pd.read_csv(constants.NYT_DATA_FILE,
-                 dtype=constants.DATA_TYPES,
-                 parse_dates=constants.PARSE_DATES)
-
-
-# Log the latest update
-with open(constants.LOG, 'a') as logfile:
-    logfile.write(str(datetime.date.today()) + '\n')
+    return None
 
 
-
-subprocess.run(shlex.split(cmd))
 

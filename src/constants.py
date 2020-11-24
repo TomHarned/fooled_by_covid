@@ -17,3 +17,5 @@ DATA_TYPES = {'date': 'str',
               }
 
 PARSE_DATES = ['date']
+
+LOG = '../data/update_log'
