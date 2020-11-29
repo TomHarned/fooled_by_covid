@@ -2,10 +2,7 @@ import subprocess
 import datetime
 import requests
 import shlex
-import pandas as pd
-import importlib
 import constants
-
 
 # If the file has been updated today, then update it
 def check_updated(log_file_name: str = constants.LOG) -> bool:
