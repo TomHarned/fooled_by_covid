@@ -1,11 +1,17 @@
-import subprocess
 import datetime
-import requests
+import subprocess
 import shlex
-import constants
+import requests
+from constants import (
+    NYT_BACKUP_FILE,
+    NYT_DATA_ALL,
+    NYT_DATA_FILE,
+    LOG
+)
+
 
 # If the file has been updated today, then update it
-def check_updated(log_file_name: str = constants.LOG) -> bool:
+def check_updated(log_file_name: str = LOG) -> bool:
     """
     Checks the logfile to see if the data
        was updated today
@@ -22,7 +28,7 @@ def check_updated(log_file_name: str = constants.LOG) -> bool:
 
     # Get the last line of the log file
     # this is not very efficient, but the file is super small, so...
-    with open(constants.LOG) as f:
+    with open(log_file_name) as f:
         for line in f:
             pass
     last_line = line.strip('\n')
@@ -36,10 +42,10 @@ def check_updated(log_file_name: str = constants.LOG) -> bool:
     return updated_today
 
 
-def replace_live_file(data_url: str = constants.NYT_DATA_ALL,
-                      live_file: str = constants.NYT_DATA_FILE,
-                      backup_file: str = constants.NYT_BACKUP_FILE,
-                      log_file: str = constants.LOG) -> None:
+def replace_live_file(data_url: str = NYT_DATA_ALL,
+                      live_file: str = NYT_DATA_FILE,
+                      backup_file: str = NYT_BACKUP_FILE,
+                      log_file: str = LOG) -> None:
     """
     Replace the current live file with the current version on the NYT
     github site for covid data.
@@ -65,24 +71,19 @@ def replace_live_file(data_url: str = constants.NYT_DATA_ALL,
     file_cmd = f"mv {live_file} {backup_file}"
 
     try:
-        subprocess.run(shlex.split(file_cmd))
-    except:
+        subprocess.run(shlex.split(file_cmd), check=True)
+    except FileNotFoundError:
         print("Live file does not exist...no backup created")
 
     # Replace the "live" file with new
-    r = requests.get(data_url)
+    req = requests.get(data_url)
     with open(live_file, 'wb') as f:
-        f.write(r.content)
+        f.write(req.content)
 
     # Log the latest update
-    with open(constants.LOG, 'a') as logfile:
+    with open(log_file, 'a') as logfile:
         logfile.write(str(datetime.date.today()) + '\n')
 
     now = datetime.datetime.now().strftime('%D %H:%M')
 
     print(f"\nData updated as of {now}\n")
-
-    return None
-
-
-
