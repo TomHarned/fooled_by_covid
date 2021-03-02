@@ -1,5 +1,5 @@
 import pandas as pd
-from constants import DATA_TYPES, NYT_DATA_FILE, PARSE_DATES
+from constants import (DATA_TYPES, NYT_DATA_FILE, PARSE_DATES)
 
 
 def read_data(live_file: str = NYT_DATA_FILE,
@@ -81,14 +81,24 @@ def calc_daily_metrics(df: pd.DataFrame) -> pd.DataFrame:
     """
     df_prior_day = make_lagged_data(df, lag=1)
 
-    df_prior_day['daily_cases'] = (df_prior_day['cases']
-                                   - df_prior_day['cases_lag_1_day'])
+    df_prior_day['daily_cases'] = (df_prior_day['cases'] -
+                                   df_prior_day['cases_lag_1_day'])
 
-    df_prior_day['daily_deaths'] = (df_prior_day['deaths']
-                                    - df_prior_day['deaths_lag_1_day'])
+    df_prior_day['daily_deaths'] = (df_prior_day['deaths'] -
+                                    df_prior_day['deaths_lag_1_day'])
 
     df_daily_nums = df_prior_day.copy()
     df_daily_nums = df_daily_nums.drop(['cases_lag_1_day',
                                         'deaths_lag_1_day'],
                                        axis=1)
     return df_daily_nums
+
+
+def calc_lagging_metrics(df: pd.DataFrame) -> pd.DateOffset:
+    """
+    Summary:
+        COVID has an approximpate two-week incubation period so case numbers
+        don't reflect the situation as it is today, but rather the sitation as
+        it was two weeks ago
+    """
+    raise NotImplementedError

@@ -7,10 +7,8 @@ import update_data
 import datetime
 import fbc_utils
 
-pd.set_option('display.max_columns', None)
-sns.set(rc={'figure.figsize':(11, 4)})
-importlib.reload(update_data)
-importlib.reload(fbc_utils)
+# importlib.reload(update_data)
+# importlib.reload(fbc_utils)
 
 updated = update_data.check_updated()
 if not updated:
@@ -64,4 +62,32 @@ pd.re
 
 # TODO 4 - move all this to a mysql DB
 
-# TODO 5 - move this whole thing to aws
+# TODO 5 - move this whole thing to awso
+#
+from threading import Timer
+
+timeout = 5
+t = Timer(timeout, print,
+          ['\nno selection, using default value of "1"'])
+t.start()
+prompt = "Select 1 or 2: \n"
+answer = str(input(prompt))
+t.cancel()
+if answer not in ['1', '2']:
+    answer = '1'
+
+
+#make an option to specify cluster in command line
+# Add it to start_spark / spark connection and make it local
+# if spark gets started manually, the prompt never gets called
+
+def some_func(arg1):
+    """Some docstring"""
+
+    print(arg1)
+
+    result = arg1 + 2
+
+    better_result = result + 3
+
+    return better_result
