@@ -14,7 +14,6 @@ def read_data(live_file: str = NYT_DATA_FILE,
                      parse_dates=date_parse_cols)
     return df
 
-
 def make_lagged_data(df: pd.DataFrame, lag: int = 1) -> pd.DataFrame:
     """
     Summary:
@@ -102,3 +101,4 @@ def calc_lagging_metrics(df: pd.DataFrame) -> pd.DateOffset:
         it was two weeks ago
     """
     raise NotImplementedError
+
